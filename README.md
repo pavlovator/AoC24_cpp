@@ -1,2 +1,2 @@
 # clang++ compile ... 
-clang++ main.cpp -o main -I../../include && ./main
+clang++ -std=c++17 main.cpp -o main -I../../include && ./main

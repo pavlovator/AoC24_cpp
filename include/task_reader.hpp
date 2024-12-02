@@ -4,9 +4,11 @@
 #include <vector>
 #include <string>
 #include <fstream>
+#include <string_view>
 
-inline std::vector<std::string> readInput(std::string file_path) {
-    std::ifstream file(file_path);    
+
+inline std::vector<std::string> readInput(std::string_view file_path) {
+    std::ifstream file(file_path.data());    
     std::vector<std::string> input_vector;
     std::string row;
 
