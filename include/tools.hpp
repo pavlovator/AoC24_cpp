@@ -1,5 +1,5 @@
-#ifndef TASKREADER_HPP
-#define TASKREADER_HPP
+#ifndef TOOLS_HPP
+#define TOOLS_HPP
  
 #include <vector>
 #include <string>
@@ -20,4 +20,11 @@ inline std::vector<std::string> readInput(std::string_view file_path) {
     return input_vector;
 }
 
-#endif // TASKREADER.hpp
+inline std::vector<std::string> split(std::string input, std::string seperator) {
+    std::vector<std::string> output;
+    int start = 0;
+    int length = 0;
+    return output;
+}
+
+#endif // TOOLS_HPP.hpp
