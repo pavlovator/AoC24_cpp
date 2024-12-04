@@ -5,12 +5,18 @@
 #include <string>
 #include <fstream>
 #include <string_view>
-
+#include <iostream>
 
 inline std::vector<std::string> readInput(std::string_view file_path) {
     std::ifstream file(file_path.data());    
     std::vector<std::string> input_vector;
     std::string row;
+    
+    if (!file) {
+        std::cout << "File does not exist!" << std::endl;
+        return input_vector;
+    }
+
 
     while (getline(file, row)) {   
         input_vector.push_back(row);
