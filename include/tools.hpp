@@ -6,6 +6,7 @@
 #include <fstream>
 #include <string_view>
 #include <iostream>
+#include <sstream>
 
 inline std::vector<std::string> readInput(std::string_view file_path) {
     std::ifstream file(file_path.data());    
@@ -26,10 +27,14 @@ inline std::vector<std::string> readInput(std::string_view file_path) {
     return input_vector;
 }
 
-inline std::vector<std::string> split(std::string input, std::string seperator) {
+inline std::vector<std::string> split(std::string input, char del) {
     std::vector<std::string> output;
-    int start = 0;
-    int length = 0;
+    std::stringstream ss(input);
+    std::string chunk;
+    while (!ss.eof()) {
+        std::getline(ss, chunk, del);
+        output.push_back(chunk);
+    }
     return output;
 }
 
