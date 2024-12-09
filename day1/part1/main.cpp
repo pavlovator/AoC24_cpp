@@ -4,9 +4,7 @@
 #include <sstream>
 #include <algorithm>
 #include "../../include/tools.hpp"
-
 using namespace std;
-
 int main() {
     vector<int> left_list;
     vector<int> right_list;

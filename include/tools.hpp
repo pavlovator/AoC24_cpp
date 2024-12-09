@@ -8,6 +8,7 @@
 #include <iostream>
 #include <sstream>
 
+
 inline std::vector<std::string> readInput(std::string_view file_path) {
     std::ifstream file(file_path.data());    
     std::vector<std::string> input_vector;
