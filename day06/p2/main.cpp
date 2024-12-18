@@ -3,6 +3,8 @@
 #include "../../include/tools.hpp"
 #include <cstdlib> // For system()
 #include <unistd.h>
+#include <set>
+#include <sstream>
 
 using namespace std;
 
@@ -13,6 +15,7 @@ enum class GuardState {
     Out,
     InNonInfinite
 };
+
 
 pair<int, int> findGuard(vector<string>& gmap) {
     for (int i=0; i<gmap.size(); i++) {
@@ -39,7 +42,7 @@ bool isObstacle(int x, int y, vector<string>& gmap) {
 
 
 void printGmap(vector<string>& gmap) {
-    usleep(500000);
+    usleep(100000);
     system("clear"); // On Linux or Mac
     for (auto& row: gmap) {
         for (char c: row) {
@@ -54,10 +57,18 @@ void printGmap(vector<string>& gmap) {
     cout << "------------" << endl;
 }
 
-void moveGuard(vector<string>& gmap, pair<int, int>& guard) {
+string visitedHash(int x, int y, char orientation) {
+    ostringstream oss;
+    oss << x << ' ' << y << orientation;
+    return oss.str();
+}
+
+void moveGuard(vector<string>& gmap, pair<int, int>& guard, set<string>& visited) {
     char orientation = gmap[guard.first][guard.second];
     int x = guard.first;
     int y = guard.second;
+    visited.insert(visitedHash(x, y, orientation));
+
     int new_x = x;
     int new_y = y;
     char new_orientation = '?';
@@ -65,7 +76,6 @@ void moveGuard(vector<string>& gmap, pair<int, int>& guard) {
         if (isObstacle(x-1, y, gmap)) {
            new_orientation = '>'; 
         } else {
-            gmap[x][y] = 'U';
             new_x = x - 1;
             new_orientation = '^';
         }
@@ -73,7 +83,6 @@ void moveGuard(vector<string>& gmap, pair<int, int>& guard) {
         if (isObstacle(x+1, y, gmap)) {
             new_orientation = '<';
         } else {
-            gmap[x][y] = 'D';
             new_x = x + 1;
             new_orientation = 'v';
         }
@@ -81,7 +90,6 @@ void moveGuard(vector<string>& gmap, pair<int, int>& guard) {
         if (isObstacle(x, y+1, gmap)) {
             new_orientation = 'v';
         } else {
-            gmap[x][y] = 'R';
             new_y = y + 1;
             new_orientation = '>';
         }
@@ -89,7 +97,6 @@ void moveGuard(vector<string>& gmap, pair<int, int>& guard) {
         if (isObstacle(x, y-1, gmap)) {
             new_orientation = '^';
         } else {
-            gmap[x][y] = 'L';
             new_y = y - 1;
             new_orientation = '<';
         }
@@ -97,15 +104,14 @@ void moveGuard(vector<string>& gmap, pair<int, int>& guard) {
     guard.first = new_x;
     guard.second = new_y;
     gmap[new_x][new_y] = new_orientation;
-    time_s++;
-    if (time_s%6000 == 0){
-        printGmap(gmap);
-    }
 }
 
-GuardState guardState(vector<string>& gmap, pair<int, int>& guard) {
+GuardState guardState(vector<string>& gmap, pair<int, int>& guard, set<string>& visited) {
+    
     int x = guard.first;
     int y = guard.second;
+    string new_hash = visitedHash(x, y, gmap[x][y]);
+
     if (gmap[x][y] == '>' && y == gmap[0].size()-1) {
         return GuardState::Out;
     }        
@@ -118,30 +124,20 @@ GuardState guardState(vector<string>& gmap, pair<int, int>& guard) {
     if (gmap[x][y] == 'v' && x == gmap.size()-1) {
         return GuardState::Out;
     }
-
-    if (gmap[x][y] == '>' && gmap[x][y+1] == 'R') {
-        return GuardState::Infinite;
-    }
-    if (gmap[x][y] == '<' && gmap[x][-1] == 'L') {
-        return GuardState::Infinite;
-    }
-    if (gmap[x][y] == '^' && gmap[x-1][y] == 'U') {
-        return GuardState::Infinite;
-    }
-    if (gmap[x][y] == 'v' && gmap[x+1][y] == 'D') {
+    if (visited.find(new_hash) != visited.end()) {
         return GuardState::Infinite;
     }
     return GuardState::InNonInfinite;
 }
 
 
-bool isInfinite(vector<string>& gmap) {
+bool isInfinite(vector<string>& gmap, set<string>& visited) {
     pair<int, int> guard = findGuard(gmap);
-    while (guardState(gmap, guard) != GuardState::Out) {
-        if (guardState(gmap, guard) == GuardState::Infinite) {
+    while (guardState(gmap, guard, visited) != GuardState::Out) {
+        if (guardState(gmap, guard, visited) == GuardState::Infinite) {
             return true;
         }
-        moveGuard(gmap, guard);
+        moveGuard(gmap, guard, visited);
     }
     return false;
 }
@@ -151,16 +147,13 @@ int main() {
     auto guard_map = readInput("../input.txt");
     for (int i=0; i<guard_map.size(); i++) {
         for (int j=0; j<guard_map[i].size(); j++) {
-            cout << i << " " << j << endl;
-            if (i == 17 && j == 12) {
-
             if (guard_map[i][j] == '.') {
                 vector<string> guard_map_copy = guard_map;
+                set<string> visited;
                 guard_map_copy[i][j] = '#';
-                if (isInfinite(guard_map_copy)) {
+                if (isInfinite(guard_map_copy, visited)) {
                     result++;
                 }
-            }
             }
         }
     }
