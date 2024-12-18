@@ -8,7 +8,7 @@ using namespace std;
 int main() {
     vector<int> left_list;
     vector<int> right_list;
-    auto input = readInput("input.txt");
+    auto input = readInput("../input.txt");
     int left, right;
     for (string row : input) {
         stringstream ss(row);
